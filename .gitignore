@@ -1,0 +1,20 @@
+build/
+.cache/
+.idea
+.vscode
+.env
+.claude/
+*.o
+*.obj
+compile_commands.json
+
+# sandbox/dev-shell placeholder files (character-special stubs, not real content)
+.bashrc
+.bash_profile
+.profile
+.zprofile
+.zshrc
+.gitconfig
+.gitmodules
+.mcp.json
+.ripgreprc
