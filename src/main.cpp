@@ -53,6 +53,8 @@ int main(int, char**) {
             dt = 0.1f;
         prev = now;
 
+        input.update();
+
         // --- 入力 ---
         SDL_Event ev;
         while (SDL_PollEvent(&ev)) {
@@ -63,7 +65,6 @@ int main(int, char**) {
             }
         }
 
-        input.update();
         playerPtr->handleInput(input);
 
         // --- 更新 ---
