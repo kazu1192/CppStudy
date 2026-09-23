@@ -1,6 +1,7 @@
 #include "scene.h"
 #include "aabb.h"
 #include <SDL3/SDL_render.h>
+#include <cstdio>
 
 void Scene::add(std::unique_ptr<Entity> e) {
     std::printf(" Scene: %s を追加\n", e->name().c_str());
