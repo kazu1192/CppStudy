@@ -1,12 +1,14 @@
 #include "input.h"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_keyboard.h>
+#include <algorithm>
 #include <cstring>
 
 void Input::update() {
     // 前のフレームの状態を保存してから、今の状態を取得
     if (current_) {
-        std::memcpy(previous_, current_, static_cast<std::size_t>(numKeys_));
+        const int n = std::min(numKeys_, kMaxKeys);
+        std::memcpy(previous_, current_, static_cast<std::size_t>(n));
     }
     current_ = SDL_GetKeyboardState(&numKeys_);
 }
@@ -18,7 +20,7 @@ bool Input::isDown(int scancode) const {
 }
 
 bool Input::wasPressed(int scancode) const {
-    if (!current_ || scancode < 0 || scancode >= numKeys_)
+    if (!current_ || scancode < 0 || scancode >= numKeys_ || scancode >= kMaxKeys)
         return false;
     return current_[scancode] && !previous_[scancode];
 }

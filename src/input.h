@@ -11,6 +11,8 @@ class Input {
     Vec2 moveAxis() const;
 
   private:
+    static constexpr int kMaxKeys = 512;
+
     const bool* current_ = nullptr;
     bool previous_[512] = {};
     int numKeys_ = 0;
