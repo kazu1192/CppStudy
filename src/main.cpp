@@ -1,6 +1,7 @@
 #include "entity.h"
 #include "input.h"
 #include "scene.h"
+#include "sdl_context.h"
 #include "window.h"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
@@ -9,6 +10,12 @@
 #include <memory>
 
 int main(int, char**) {
+
+    SdlContext sdl;
+    if (!sdl.isValid()) {
+        return 1;
+    }
+
     Window window{"My Engine", 800, 600};
     if (!window.isValid()) {
         std::printf("ウインドウの作成に失敗しました\n");

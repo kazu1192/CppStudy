@@ -6,11 +6,6 @@
 Window::Window(const std::string& title, int width, int height) {
     std::printf("[Window] コンストラクタ: %s\n", title.c_str());
 
-    if (!SDL_Init(SDL_INIT_VIDEO)) {
-        std::printf("SDL_Init 失敗: %s\n", SDL_GetError());
-        return;
-    }
-
     window_ = SDL_CreateWindow(title.c_str(), width, height, 0);
 
     if (!window_) {
@@ -41,8 +36,6 @@ void Window::release() noexcept {
         SDL_DestroyWindow(window_);
         window_ = nullptr;
     }
-
-    SDL_Quit();
 }
 
 Window::~Window() {
@@ -60,8 +53,8 @@ Window& Window::operator=(Window&& other) noexcept {
     std::printf("[Window] ムーブ代入\n");
     if (this != &other) {
         release();
-        window_ = std::move(other.window_);
-        renderer_ = std::move(other.renderer_);
+        window_ = std::exchange(other.window_, nullptr);
+        renderer_ = std::exchange(other.renderer_, nullptr);
     }
     return *this;
 }

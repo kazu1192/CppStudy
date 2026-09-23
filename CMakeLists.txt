@@ -13,6 +13,7 @@ add_executable(engine
     src/entity.cpp
     src/scene.cpp
     src/input.cpp
+    src/sdl_context.cpp
 )
 
 target_include_directories(engine PRIVATE src)

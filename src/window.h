@@ -15,7 +15,7 @@ class Window {
     Window(Window&& other) noexcept;
     Window& operator=(Window&& other) noexcept;
 
-    bool isValid() const { return window_ != nullptr; }
+    bool isValid() const { return window_ != nullptr && renderer_ != nullptr; }
 
     SDL_Window* handle() const { return window_; }
     SDL_Renderer* renderer() const { return renderer_; }
