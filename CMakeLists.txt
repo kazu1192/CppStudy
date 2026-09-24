@@ -5,37 +5,28 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)   # clangd 用
 
-find_package(SDL3 REQUIRED)
+# サブディレクトリに分けても実行ファイルは build/ 直下に出す
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 # 全ターゲット共通の警告設定とサニタイザ
 add_library(project_options INTERFACE)
-target_compile_options(project_options INTERFACE
-    -Wall -Wextra -g -fsanitize=address,undefined)
-target_link_options(project_options INTERFACE -fsanitize=address,undefined)
-target_include_directories(project_options INTERFACE src)
+target_compile_options(project_options INTERFACE -Wall -Wextra -g)
+if(NOT WIN32)   # mingw-w64 の GCC は ASan/UBSan 非対応
+    target_compile_options(project_options INTERFACE -fsanitize=address,undefined)
+    target_link_options(project_options INTERFACE -fsanitize=address,undefined)
+endif()
 
-# --- 本体: SDL3 を使ったゲームループのデモ ---
-add_executable(engine
-    src/main.cpp
-    src/window.cpp
-    src/entity.cpp
-    src/scene.cpp
-    src/input.cpp
-    src/sdl_context.cpp
-)
-target_link_libraries(engine PRIVATE project_options SDL3::SDL3)
+# OS 非依存の共有ヘッダ（Vec2 / Vec3 / AABB / Color）
+add_library(core INTERFACE)
+target_include_directories(core INTERFACE core)
 
-# --- RAII / ムーブセマンティクスの練習用デモ（SDL 不要） ---
-add_executable(raii_demo
-    src/raii_demo.cpp
-    src/texture.cpp
-)
-target_link_libraries(raii_demo PRIVATE project_options)
+if(NOT WIN32)
+    add_subdirectory(app/sdl_engine)
+    add_subdirectory(app/raii_demo)
+endif()
+if(WIN32)
+    add_subdirectory(app/win32gui)
+endif()
 
-# --- テスト ---
 enable_testing()
-
-add_executable(test_math tests/test_math.cpp)
-target_link_libraries(test_math PRIVATE project_options)
-
-add_test(NAME math COMMAND test_math)
+add_subdirectory(tests)

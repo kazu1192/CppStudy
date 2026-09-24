@@ -21,7 +21,7 @@ Claude（AI）とペアプログラミングしながら、C++20 の基礎とゲ
 - `constexpr` によるコンパイル時計算
 - AABB を用いた矩形同士の衝突判定
 - ゲームループにおける入力サンプリングのタイミング
-- CMake / Makefile 双方でのビルド構成
+- CMake のサブディレクトリによるマルチターゲット構成（アプリごとの分割と共有ライブラリ）
 - AddressSanitizer / UndefinedBehaviorSanitizer を使ったデバッグ
 
 ## ビルド環境
@@ -63,31 +63,27 @@ ctest --test-dir build --output-on-failure
 
 外部のテストフレームワークには依存していません。`constexpr` にできる検証は `static_assert` で書いてあるので、コンパイルが通った時点で検証済みです。
 
-### Makefile
-
-CMake を使わずに `engine` 相当のバイナリだけを作る場合はこちら。
-
-```sh
-make
-./app
-```
-
 ## ディレクトリ構成
 
 ```
-src/
-├── main.cpp        # エントリポイント・ゲームループ
-├── sdl_context.*   # SDL の初期化/終了（RAII）
-├── window.*        # SDL ウィンドウ/レンダラーのラッパー
-├── entity.*        # Entity 基底クラス、Player / Box
-├── scene.*         # エンティティ管理・衝突判定
-├── input.*         # キーボード入力
+core/               # OS 非依存の共有ヘッダ（全ターゲットから参照）
 ├── aabb.h          # AABB（矩形）の衝突判定
 ├── vec2.h / vec3.h # ベクトル演算
-├── color.h         # カラーパレット
-├── raii_demo.cpp   # RAII / ムーブの練習デモ
-├── texture.*       # RAII 練習用のテクスチャ（raii_demo で使用）
-└── fake_gl.h       # 偽 OpenGL。テクスチャIDの生存を追跡してリーク・二重解放を報告する
+└── color.h         # カラーパレット
+
+app/
+├── sdl_engine/     # SDL3 ゲームループデモ → build/engine
+│   ├── main.cpp        # エントリポイント・ゲームループ
+│   ├── sdl_context.*   # SDL の初期化/終了（RAII）
+│   ├── window.*        # SDL ウィンドウ/レンダラーのラッパー
+│   ├── entity.*        # Entity 基底クラス、Player / Box
+│   ├── scene.*         # エンティティ管理・衝突判定
+│   └── input.*         # キーボード入力
+├── raii_demo/      # RAII / ムーブの練習デモ（SDL 不要） → build/raii_demo
+│   ├── raii_demo.cpp
+│   ├── texture.*       # RAII 練習用のテクスチャ
+│   └── fake_gl.h       # 偽 OpenGL。テクスチャIDの生存を追跡してリーク・二重解放を報告する
+└── win32gui/       # Windows GUI アプリ（作成予定）
 
 tests/
 └── test_math.cpp   # Vec2 / Vec3 / AABB のテスト
