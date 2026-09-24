@@ -1,4 +1,12 @@
 #include "app_window.h"
+#include <cstdio>
+
+AppWindow::~AppWindow() {
+    std::printf("[AppWindow] デストラクタ: hwnd_=%p\n", (void*)hwnd_);
+    if (hwnd_) {
+        DestroyWindow(hwnd_);
+    }
+}
 
 LRESULT CALLBACK AppWindow::wndProcStatic(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
     AppWindow* self = nullptr;
@@ -33,9 +41,13 @@ LRESULT AppWindow::wndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
         EndPaint(hwnd, &ps);
         return 0;
     }
-    case WM_DESTROY:
+    case WM_DESTROY: // 破棄の途中
         PostQuitMessage(0);
         return 0;
+    case WM_NCDESTROY: // 最後のメッセージ
+        SetWindowLongPtrW(hwnd, GWLP_USERDATA, 0);
+        hwnd_ = nullptr;
+        break; // DefWindowProcに流す
     }
     return DefWindowProcW(hwnd, msg, wp, lp);
 }
@@ -50,7 +62,8 @@ bool AppWindow::create() {
     wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
     wc.lpszClassName = L"MyWindowClass";
 
-    if (!RegisterClassExW(&wc)) {
+    static const ATOM atom = RegisterClassExW(&wc); // 関数内static
+    if (!atom) {
         return false;
     }
 

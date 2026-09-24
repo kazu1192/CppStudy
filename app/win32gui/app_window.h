@@ -3,6 +3,14 @@
 
 class AppWindow {
   public:
+    AppWindow() = default;
+    ~AppWindow();
+
+    AppWindow(const AppWindow&) = delete;
+    AppWindow& operator=(const AppWindow&) = delete;
+    AppWindow(AppWindow&&) = delete;
+    AppWindow& operator=(AppWindow&&) = delete;
+
     bool create();
     int run();
 
