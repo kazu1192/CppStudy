@@ -4,6 +4,7 @@ build/
 .vscode
 .env
 .claude/
+.serena/
 *.o
 *.obj
 compile_commands.json
