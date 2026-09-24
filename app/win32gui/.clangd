@@ -1,0 +1,10 @@
+# scripts/gen-clangd-win.sh が生成。手で編集しないこと。
+CompileFlags:
+  CompilationDatabase: ../../build-win
+  Add:
+    - -isystem/nix/store/fikgs0aq9sd1lldg6rzidn6b666x8g07-mcfgthread-x86_64-w64-mingw32-2.4.2-dev/include
+    - -isystem/nix/store/y7nh4wm31shax8r6j7y8hhmxg4zl6v1l-x86_64-w64-mingw32-gcc-15.3.0/include/c++/15.3.0/
+    - -isystem/nix/store/y7nh4wm31shax8r6j7y8hhmxg4zl6v1l-x86_64-w64-mingw32-gcc-15.3.0/include/c++/15.3.0/x86_64-w64-mingw32
+    - -isystem/nix/store/y7nh4wm31shax8r6j7y8hhmxg4zl6v1l-x86_64-w64-mingw32-gcc-15.3.0/include/c++/15.3.0/backward
+    - -isystem/nix/store/y7nh4wm31shax8r6j7y8hhmxg4zl6v1l-x86_64-w64-mingw32-gcc-15.3.0/lib/gcc/x86_64-w64-mingw32/15.3.0/../../../../x86_64-w64-mingw32/sys-include
+    - -isystem/nix/store/3n4557d1w30xpy2l16a5dxvjiz0cflqj-mingw-w64-x86_64-w64-mingw32-14.0.0-dev/include
