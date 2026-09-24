@@ -54,6 +54,27 @@ In an interactive session they can type:
 
 That runs outside the sandbox and its output comes back into the conversation.
 
+### Baseline from a real run (WSLg, 2026-09-24)
+
+A window opens and the loop holds ~60fps, but note the third line:
+
+```
+[Window] レンダラ: software
+```
+
+`window.cpp` asks for `"opengl,software"`, so OpenGL is being tried first and
+**failing**, and SDL falls back to the software renderer. Same root as the
+`MESA: error: Failed to create DXCore adapter factory` seen headless — Mesa's
+D3D12 path under WSLg. Harmless for a few rectangles at 60fps, so `software`
+here is the expected baseline, not a regression to chase. To dig in anyway:
+force `SDL_RENDER_DRIVER=opengl` and read `SDL_GetError()`.
+
+The real run is also the only place the player moves under its own power —
+that is what distinguishes it from the headless one. Collisions with `青`
+(reached only by moving) appearing alongside `赤` is the signal that
+`Input` → `moveAxis()` → `Player::handleInput` works end to end. A real run
+that shows only `赤`, exactly like the headless run, means input is dead.
+
 ## engine: headless recipe that does work
 
 ```sh
@@ -103,5 +124,9 @@ UBSan or LeakSanitizer output at all**.
 
 `Input::update()` runs every frame but no key is ever down, so `moveAxis()`
 stays zero and the player never moves under its own power. Player collisions
-seen here come from a box bouncing into it. Driving actual input needs the
-user and `! ./build/engine`.
+seen here come from a box bouncing into it — in practice only `赤`, which is
+why a headless run cannot tell a working `Input` from a broken one. Driving
+actual input needs the user and `! ./build/engine`.
+
+`黄` has not been observed colliding in either mode. Most likely nobody has
+steered into it rather than anything being wrong, but it is untested ground.
