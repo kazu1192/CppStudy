@@ -25,7 +25,12 @@ if(NOT WIN32)
     add_subdirectory(app/raii_demo)
 endif()
 if(WIN32)
-    add_subdirectory(app/win32gui)
+    # まだ空のうちは configure を失敗させない
+    if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/app/win32gui/CMakeLists.txt)
+        add_subdirectory(app/win32gui)
+    else()
+        message(STATUS "app/win32gui はまだ空です（Windows GUI アプリ未作成）")
+    endif()
 endif()
 
 enable_testing()

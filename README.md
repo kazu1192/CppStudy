@@ -55,6 +55,25 @@ cmake --build build
 
 `engine` を実行すると、プレイヤー（矩形）をキーボードで動かしつつ、跳ね返る3つの箱との衝突を検出してコンソールに表示するデモが起動します。
 
+### Windows 向けクロスビルド
+
+`flake.nix` の devShell に mingw-w64 のクロスコンパイラ（`pkgsCross.mingwW64`）が
+入っているので、WSL 上から Windows の `.exe` を直接生成できる。
+
+```sh
+cmake -B build-win -DCMAKE_TOOLCHAIN_FILE=cmake/mingw-w64.cmake
+cmake --build build-win
+./build-win/test_math.exe        # WSL interop でそのまま Windows 上で起動する
+```
+
+ネイティブ用の `build/` とは別ディレクトリなので、両方を並行して持てる。
+クロス側では `engine` と `raii_demo`（SDL 依存）は構成されず、OS 非依存の
+`test_math` と、今後の `app/win32gui` だけがビルド対象になる。
+
+AddressSanitizer / UndefinedBehaviorSanitizer は mingw-w64 の GCC が
+サポートしていないため、`CMakeLists.txt` 側で Windows ターゲットのときだけ
+無効化している。
+
 ### テスト
 
 ```sh
