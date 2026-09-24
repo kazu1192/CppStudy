@@ -7,6 +7,14 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)   # clangd 用
 
 find_package(SDL3 REQUIRED)
 
+# 全ターゲット共通の警告設定とサニタイザ
+add_library(project_options INTERFACE)
+target_compile_options(project_options INTERFACE
+    -Wall -Wextra -g -fsanitize=address,undefined)
+target_link_options(project_options INTERFACE -fsanitize=address,undefined)
+target_include_directories(project_options INTERFACE src)
+
+# --- 本体: SDL3 を使ったゲームループのデモ ---
 add_executable(engine
     src/main.cpp
     src/window.cpp
@@ -15,9 +23,11 @@ add_executable(engine
     src/input.cpp
     src/sdl_context.cpp
 )
+target_link_libraries(engine PRIVATE project_options SDL3::SDL3)
 
-target_include_directories(engine PRIVATE src)
-target_link_libraries(engine PRIVATE SDL3::SDL3)
-target_compile_options(engine PRIVATE
-    -Wall -Wextra -g -fsanitize=address,undefined)
-target_link_options(engine PRIVATE -fsanitize=address,undefined)
+# --- RAII / ムーブセマンティクスの練習用デモ（SDL 不要） ---
+add_executable(raii_demo
+    src/raii_demo.cpp
+    src/texture.cpp
+)
+target_link_libraries(raii_demo PRIVATE project_options)
