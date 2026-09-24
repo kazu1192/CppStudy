@@ -13,7 +13,7 @@ struct AABB {
 };
 
 // 重なっているか
-inline bool intersects(const AABB& a, const AABB& b) {
+constexpr bool intersects(const AABB& a, const AABB& b) {
     if (a.max.x < b.min.x || a.min.x > b.max.x)
         return false;
     if (a.max.y < b.min.y || a.min.y > b.max.y)
@@ -22,6 +22,6 @@ inline bool intersects(const AABB& a, const AABB& b) {
 }
 
 // 点が含まれるか
-inline bool contains(const AABB& box, const Vec2& p) {
+constexpr bool contains(const AABB& box, const Vec2& p) {
     return p.x >= box.min.x && p.x <= box.max.x && p.y >= box.min.y && p.y <= box.max.y;
 }
