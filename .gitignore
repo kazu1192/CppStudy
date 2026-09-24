@@ -3,7 +3,8 @@ build/
 .idea
 .vscode
 .env
-.claude/
+.claude/*
+!.claude/skills/
 .serena/
 *.o
 *.obj
