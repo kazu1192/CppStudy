@@ -31,3 +31,11 @@ add_executable(raii_demo
     src/texture.cpp
 )
 target_link_libraries(raii_demo PRIVATE project_options)
+
+# --- テスト ---
+enable_testing()
+
+add_executable(test_math tests/test_math.cpp)
+target_link_libraries(test_math PRIVATE project_options)
+
+add_test(NAME math COMMAND test_math)
