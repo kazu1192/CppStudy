@@ -7,9 +7,8 @@ C++ 学習用リポジトリ。SDL3 を使って簡単な2Dゲームエンジン
 - `Entity` を基底クラスとした簡単なエンティティ管理（`Player` / `Box`）
 - `Scene` によるエンティティの一括更新・描画・AABB衝突判定
 - キーボード入力処理（`Input`）とプレイヤー移動
-- 固定色パレット（`Color`）、`Vec2` / `Vec3` などの基本的な数学ユーティリティ
-
-`src/main.cpp` を実行すると、プレイヤー（矩形）をキーボードで動かしつつ、跳ね返る3つの箱との衝突を検出してコンソールに表示するデモが起動します。
+- `SdlContext` / `Window` / `Texture` による RAII なリソース管理
+- 固定色パレット（`Color`）、`Vec2` / `Vec3` などの基本的な数学ユーティリティ（`constexpr` 対応）
 
 ## 学習について
 
@@ -17,8 +16,11 @@ Claude（AI）とペアプログラミングしながら、C++20 の基礎とゲ
 
 - 継承と仮想関数によるポリモーフィズム（`Entity` → `Player` / `Box`）
 - `std::unique_ptr` によるオブジェクトの所有権管理
-- RAII の考え方
+- RAII の考え方と、サブシステム初期化の寿命・破棄順（`SdlContext`）
+- ムーブセマンティクス（`std::exchange` による所有権の移譲、二重解放の回避）
+- `constexpr` によるコンパイル時計算
 - AABB を用いた矩形同士の衝突判定
+- ゲームループにおける入力サンプリングのタイミング
 - CMake / Makefile 双方でのビルド構成
 - AddressSanitizer / UndefinedBehaviorSanitizer を使ったデバッグ
 
@@ -41,10 +43,29 @@ nix develop
 ```sh
 cmake -B build
 cmake --build build
-./build/engine
 ```
 
+3つのターゲットができます。
+
+| ターゲット | 内容 |
+| --- | --- |
+| `./build/engine` | SDL3 のゲームループデモ（本体） |
+| `./build/raii_demo` | RAII / ムーブセマンティクスの練習デモ（SDL 不要） |
+| `./build/test_math` | 数学ユーティリティのテスト |
+
+`engine` を実行すると、プレイヤー（矩形）をキーボードで動かしつつ、跳ね返る3つの箱との衝突を検出してコンソールに表示するデモが起動します。
+
+### テスト
+
+```sh
+ctest --test-dir build --output-on-failure
+```
+
+外部のテストフレームワークには依存していません。`constexpr` にできる検証は `static_assert` で書いてあるので、コンパイルが通った時点で検証済みです。
+
 ### Makefile
+
+CMake を使わずに `engine` 相当のバイナリだけを作る場合はこちら。
 
 ```sh
 make
@@ -55,13 +76,19 @@ make
 
 ```
 src/
-├── main.cpp       # エントリポイント・ゲームループ
-├── window.*       # SDL ウィンドウ/レンダラーのラッパー
-├── entity.*       # Entity 基底クラス、Player / Box
-├── scene.*        # エンティティ管理・衝突判定
-├── input.*        # キーボード入力
-├── aabb.h         # AABB（矩形）の衝突判定
-├── vec2.h / vec3.h# ベクトル演算
-├── color.h        # カラーパレット
-└── fake_gl.h      # 補助ヘッダ
+├── main.cpp        # エントリポイント・ゲームループ
+├── sdl_context.*   # SDL の初期化/終了（RAII）
+├── window.*        # SDL ウィンドウ/レンダラーのラッパー
+├── entity.*        # Entity 基底クラス、Player / Box
+├── scene.*         # エンティティ管理・衝突判定
+├── input.*         # キーボード入力
+├── aabb.h          # AABB（矩形）の衝突判定
+├── vec2.h / vec3.h # ベクトル演算
+├── color.h         # カラーパレット
+├── raii_demo.cpp   # RAII / ムーブの練習デモ
+├── texture.*       # RAII 練習用のテクスチャ（raii_demo で使用）
+└── fake_gl.h       # 偽 OpenGL。テクスチャIDの生存を追跡してリーク・二重解放を報告する
+
+tests/
+└── test_math.cpp   # Vec2 / Vec3 / AABB のテスト
 ```
