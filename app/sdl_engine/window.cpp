@@ -13,6 +13,7 @@ Window::Window(const std::string& title, int width, int height) {
         return;
     }
 
+    // 自動選択（nullptr）ではなく、opengl を優先し使えなければ software に落とす指定にしている
     // renderer_ = SDL_CreateRenderer(window_, nullptr); // 自動選択
     renderer_ = SDL_CreateRenderer(window_, "opengl,software");
 
@@ -21,12 +22,14 @@ Window::Window(const std::string& title, int width, int height) {
         return;
     }
 
-    SDL_SetRenderVSync(renderer_, 1);
+    SDL_SetRenderVSync(renderer_, 1); // 垂直同期でフレームレートをモニタに合わせる
 
     std::printf("[Window] 生成完了: window_=%p renderer_=%p\n", (void*)window_, (void*)renderer_);
     std::printf("[Window] レンダラ: %s\n", SDL_GetRendererName(renderer_));
 }
 
+// renderer は window に紐づくため、生成と逆順（renderer → window）で破棄する。
+// 解放後は nullptr に戻すので、二重に呼んでも安全。
 void Window::release() noexcept {
     if (renderer_) {
         SDL_DestroyRenderer(renderer_);
@@ -49,6 +52,7 @@ Window::Window(Window&& other) noexcept : window_(other.window_), renderer_(othe
     other.renderer_ = nullptr;
 }
 
+// 自分が持っていたリソースを先に解放してから、相手の所有権を奪う
 Window& Window::operator=(Window&& other) noexcept {
     std::printf("[Window] ムーブ代入\n");
     if (this != &other) {

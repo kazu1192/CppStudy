@@ -1,3 +1,5 @@
+// 本物の OpenGL を使わずに RAII を検証するための偽 API。
+// 生成したIDを set で追跡し、二重解放とリークをログに出して検出する。
 #pragma once
 #include <cstdio>
 #include <set>

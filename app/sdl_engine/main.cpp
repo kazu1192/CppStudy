@@ -28,6 +28,7 @@ int main(int, char**) {
     auto player =
         std::make_unique<Player>("プレイヤー", Vec2{400, 300}, 40, colors::white, Vec2{800, 600});
 
+    // 所有権は Scene に渡すので、入力を送るための観測用ポインタだけ手元に残す
     Player* playerPtr = player.get();
     scene.add(std::move(player));
 
@@ -49,10 +50,14 @@ int main(int, char**) {
         // --- 時間 ---
         Uint64 now = SDL_GetPerformanceCounter();
         float dt = static_cast<float>(now - prev) / static_cast<float>(freq); // 1秒あたり
+        // ウィンドウ移動やブレークポイントで長く止まった後に、
+        // 巨大な dt で一気にワープしないよう上限を設ける
         if (dt > 0.1f)
             dt = 0.1f;
         prev = now;
 
+        // イベントを処理する前に呼ぶ（SDL_PollEvent がキー状態を更新するため、
+        // 先にコピーしないと「前フレーム」が最新状態になってしまう）
         input.update();
 
         // --- 入力 ---
