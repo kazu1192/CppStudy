@@ -21,3 +21,6 @@ compile_commands.json
 .gitmodules
 .mcp.json
 .ripgreprc
+build-msvc/
+.vs/
+out/
