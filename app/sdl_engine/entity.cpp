@@ -11,6 +11,8 @@ Box::Box(std::string name, Vec2 pos, Vec2 vel, float size, Color color, Vec2 bou
 void Box::update(float dt) {
     position_ += velocity_ * dt;
 
+    // 画面端に当たったら、はみ出し分を戻したうえで速度を反転して跳ね返す
+
     if (position_.x < 0.0f) {
         position_.x = 0.0f;
         velocity_.x = -velocity_.x;
@@ -31,6 +33,7 @@ void Box::update(float dt) {
 }
 
 void Box::render(SDL_Renderer* renderer) const {
+    // 衝突中は白で光らせる
     Color c = isColliding() ? colors::white : color_;
     SDL_FRect rect{position_.x, position_.y, size_, size_};
     SDL_SetRenderDrawColor(renderer, c.r, c.g, c.b, 255);
@@ -42,10 +45,13 @@ AABB Box::bounds() const { return AABB{position_, Vec2{size_, size_}}; }
 Player::Player(std::string name, Vec2 pos, float size, Color color, Vec2 bounds)
     : Entity(std::move(name), pos, Vec2{}), size_(size), color_(color), bounds_(bounds) {}
 
+// 入力は速度として保持し、実際の移動は update() で dt を掛けて行う
 void Player::handleInput(const Input& input) { velocity_ = input.moveAxis() * speed_; }
 
 void Player::update(float dt) {
     position_ += velocity_ * dt;
+
+    // 画面外に出ないよう位置だけ丸める（Box と違って速度は反転しない）
 
     if (position_.x < 0.0f)
         position_.x = 0.0f;

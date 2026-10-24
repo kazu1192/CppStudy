@@ -6,6 +6,8 @@
 
 void Input::update() {
     // 前のフレームの状態を保存してから、今の状態を取得
+    // current_ は SDL 内部の配列を指していて毎フレーム上書きされるので、
+    // 「前フレーム」と比べるには自前のバッファにコピーしておく必要がある
     if (current_) {
         const int n = std::min(numKeys_, kMaxKeys);
         std::memcpy(previous_, current_, static_cast<std::size_t>(n));

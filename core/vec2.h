@@ -1,6 +1,8 @@
 #pragma once
 #include <cmath>
 
+// 2次元ベクトル。位置・速度・サイズの表現に使う。
+// 演算子は constexpr にしてあり、コンパイル時評価（static_assert）でテストできる。
 struct Vec2 {
     float x = 0.0f;
     float y = 0.0f;
@@ -31,6 +33,7 @@ struct Vec2 {
     constexpr float lengthSquared() const { return x * x + y * y; }
     float length() const { return std::sqrt(lengthSquared()); }
 
+    // 長さ 1 に揃えたベクトル。ゼロベクトルはゼロ除算を避けてゼロのまま返す。
     Vec2 normalized() const {
         float len = length();
         if (len == 0.0f)
@@ -48,4 +51,5 @@ constexpr Vec2 operator*(float s, Vec2 v) { return v *= s; }
 // --- 内積・外積 ---
 constexpr float dot(const Vec2& l, const Vec2& r) { return l.x * r.x + l.y * r.y; }
 
+// 2D の外積はスカラー（z 成分）になる。符号で l から r への回転方向が分かる。
 constexpr float cross(const Vec2& l, const Vec2& r) { return l.x * r.y - l.y * r.x; }

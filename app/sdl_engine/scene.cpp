@@ -20,6 +20,8 @@ void Scene::renderAll(SDL_Renderer* renderer) const {
     }
 }
 
+// 総当たり（O(n^2)）で判定する。j を i+1 から始めて、同じ組を二度数えない。
+// 数が少ないうちはこれで足りるが、増えるなら空間分割などを検討する。
 std::vector<std::pair<Entity*, Entity*>> Scene::findCollisions() const {
     std::vector<std::pair<Entity*, Entity*>> result;
 

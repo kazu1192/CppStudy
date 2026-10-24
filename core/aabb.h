@@ -1,6 +1,8 @@
 #pragma once
 #include "vec2.h"
 
+// 軸平行境界ボックス（Axis-Aligned Bounding Box）。衝突判定用の矩形で、回転は扱わない。
+// 座標系は画面座標（y が下向き）なので、min が左上・max が右下になる。
 struct AABB {
     Vec2 min; // 左上
     Vec2 max; // 右下

@@ -11,6 +11,8 @@ AppWindow::~AppWindow() {
 LRESULT CALLBACK AppWindow::wndProcStatic(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
     AppWindow* self = nullptr;
 
+    // WM_NCCREATE は最初期のメッセージで、CreateWindowEx に渡した this がここで初めて取れる。
+    // 以降のメッセージは userdata から取り出す。
     if (msg == WM_NCCREATE) {
         auto* cs = reinterpret_cast<CREATESTRUCT*>(lp);
         self = static_cast<AppWindow*>(cs->lpCreateParams);
@@ -45,6 +47,7 @@ LRESULT AppWindow::wndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
         PostQuitMessage(0);
         return 0;
     case WM_NCDESTROY: // 最後のメッセージ
+        // これ以降 this を触らせないよう userdata を消し、デストラクタの DestroyWindow を防ぐ
         SetWindowLongPtrW(hwnd, GWLP_USERDATA, 0);
         hwnd_ = nullptr;
         break; // DefWindowProcに流す
@@ -62,6 +65,7 @@ bool AppWindow::create() {
     wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
     wc.lpszClassName = L"MyWindowClass";
 
+    // クラス登録は一度だけでよい。2回目以降の create() では初回の結果を使い回す。
     static const ATOM atom = RegisterClassExW(&wc); // 関数内static
     if (!atom) {
         return false;

@@ -1,6 +1,7 @@
 #pragma once
 #include <cmath>
 
+// 3次元ベクトル。Vec2 と同じ方針で、演算子は constexpr にしてある。
 struct Vec3 {
     float x = 0.0f;
     float y = 0.0f;
@@ -35,6 +36,7 @@ struct Vec3 {
     constexpr float lengthSquared() const { return x * x + y * y + z * z; }
     float length() const { return std::sqrt(lengthSquared()); }
 
+    // 長さ 1 に揃えたベクトル。ゼロベクトルはゼロ除算を避けてゼロのまま返す。
     Vec3 normalized() const {
         float len = length();
         if (len == 0.0f)
@@ -54,6 +56,7 @@ constexpr bool operator==(const Vec3& l, const Vec3& r) {
     return l.x == r.x && l.y == r.y && l.z == r.z;
 }
 
+// float の誤差を許容した比較。== は丸め誤差で外れるので、近似一致にはこちらを使う。
 constexpr bool nearlyEqual(const Vec3& l, const Vec3& r, float eps = 1e-5f) {
     return (l - r).lengthSquared() < eps * eps;
 }
