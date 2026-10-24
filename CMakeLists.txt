@@ -10,7 +10,12 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 # 全ターゲット共通の警告設定とサニタイザ
 add_library(project_options INTERFACE)
-target_compile_options(project_options INTERFACE -Wall -Wextra -g)
+if(MSVC)
+    # /utf-8: ソース内の日本語コメントを文字化け・警告なしで読ませる
+    target_compile_options(project_options INTERFACE /W4 /utf-8)
+else()
+    target_compile_options(project_options INTERFACE -Wall -Wextra -g)
+endif()
 if(NOT WIN32)   # mingw-w64 の GCC は ASan/UBSan 非対応
     target_compile_options(project_options INTERFACE -fsanitize=address,undefined)
     target_link_options(project_options INTERFACE -fsanitize=address,undefined)
